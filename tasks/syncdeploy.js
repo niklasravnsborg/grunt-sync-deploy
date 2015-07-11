@@ -7,7 +7,6 @@
  */
 
 var Q       = require('q'),
-	glob    = Q.nfbind(require('globby')),
 	fsStat  = Q.nfbind(require('fs').stat),
 	NodeSSH = require('node-ssh');
 
@@ -21,7 +20,7 @@ function arrayFind(array, key, value) {
 	}
 }
 
-function gruntSyncDeploy(ssh, deploySrc, deployTo) {
+function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo) {
 	'use strict';
 
 	var sftp,
@@ -92,16 +91,13 @@ function gruntSyncDeploy(ssh, deploySrc, deployTo) {
 			}),
 
 			// returns an array with local files
-			glob(
-				['**/*', '.htaccess'],
-				{cwd: deploySrc, nodir: true}
-			).then(function(files) {
+			Promise.resolve(deploySrc).then(function(files) {
 
 				return files.reduce(function(sequence, file, index) {
 
 					// appends these `then` functions to sequence
 					return sequence.then(function() {
-						return fsStat(deploySrc + file);
+						return fsStat(cwd + file);
 					}).then(function(stat) {
 
 						files[index] = {
@@ -172,8 +168,8 @@ function gruntSyncDeploy(ssh, deploySrc, deployTo) {
 
 			// appends these then functions to sequence
 			return sequence.then(function() {
-				var upload   = deploySrc + file,
-					uploadTo = deployTo  + file;
+				var upload   = cwd + file,
+				    uploadTo = deployTo + file;
 
 				console.log('Uploading', upload);
 				return ssh.put(upload, uploadTo, sftp);
@@ -214,8 +210,9 @@ module.exports = function(grunt) {
 		this.async();
 
 		var config    = grunt.option('config'),
-		    deployTo  = grunt.config.get('sshconfig.' + config + '.deployTo'),
-		    deploySrc = this.data.cwd;
+		    cwd       = this.data.cwd || '',
+		    deploySrc = [],
+		    deployTo  = grunt.config.get('sshconfig.' + config + '.deployTo');
 
 		var ssh = new NodeSSH({
 			host:     grunt.config.get('sshconfig.' + config + '.host'),
@@ -223,6 +220,13 @@ module.exports = function(grunt) {
 			password: grunt.config.get('sshconfig.' + config + '.password')
 		});
 
-		gruntSyncDeploy(ssh, deploySrc, deployTo);
+		this.filesSrc.forEach(function(file) {
+			// if is a file, not directory
+			if (grunt.file.isFile(cwd + file)) {
+				deploySrc.push(file);
+			}
+		});
+
+		gruntSyncDeploy(ssh, cwd, deploySrc, deployTo);
 	});
 };
