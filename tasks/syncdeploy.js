@@ -20,7 +20,7 @@ function arrayFind(array, key, value) {
 	}
 }
 
-function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo) {
+function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
 	'use strict';
 
 	var sftp,
@@ -192,6 +192,12 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo) {
 		}, Promise.resolve());
 
 	}).then(function() {
+		if (removeEmpty) {
+			// remove all empty directories
+			console.log('Removing empty directories.');
+			return ssh.exec('find ' + deployTo + ' -empty -type d -delete');
+		}
+	}).then(function() {
 
 		// close SSH connection
 		ssh.end();
@@ -205,6 +211,10 @@ module.exports = function(grunt) {
 	'use strict';
 
 	grunt.registerMultiTask('syncdeploy', 'Incremental deploy changed files to SSH.', function() {
+
+		var options = this.options({
+			removeEmpty: false
+		});
 
 		// tell Grunt to wait for this async code to finish
 		this.async();
@@ -227,6 +237,7 @@ module.exports = function(grunt) {
 			}
 		});
 
-		gruntSyncDeploy(ssh, cwd, deploySrc, deployTo);
+		gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, options.removeEmpty);
+
 	});
 };

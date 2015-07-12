@@ -50,6 +50,14 @@ sshconfig: {
 
 To use this SSH configuration by default add `grunt.option('config', 'production');` to the end of your Gruntfile.
 
+### Options
+
+#### removeEmpty
+Type: `Boolean`
+Default: `false`
+
+Remove empty directories inside the `deployTo` path on the SSH after deploying.
+
 ### Multiple targets
 You may have more than one target if you have multiple places which you wanna deploy to.
 
