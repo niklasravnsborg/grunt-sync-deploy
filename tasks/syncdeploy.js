@@ -37,6 +37,11 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
 
 	}).then(function() {
 
+		// create `deployTo` directory if it doesn't exist
+		return ssh.exec('mkdir -p ' + deployTo);
+
+	}).then(function() {
+
 		// execute array of promises and wait until they fullfill
 		return Promise.all([
 
@@ -51,8 +56,8 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
 
 				// if nothing on the server and no error
 				if (data.stdout === '' && data.stderr === '') {
-					// return that data (nothing)
-					return data.stdout;
+					// return empty array
+					return [];
 				}
 
 				// if error, return error
