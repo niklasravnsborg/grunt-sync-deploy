@@ -7,8 +7,8 @@
  */
 
 var Q       = require('q'),
-	fsStat  = Q.nfbind(require('fs').stat),
-	NodeSSH = require('node-ssh');
+    fsStat  = Q.nfbind(require('fs').stat),
+    NodeSSH = require('node-ssh');
 
 function arrayFind(array, key, value) {
 	'use strict';
@@ -74,9 +74,9 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
 
 					// split elements into date and name
 					// split char defined in ssh exec
-					var split = files[i].split('|');
-					var date = split[0];
-					var file = split[1];
+					var split = files[i].split('|'),
+					    date = split[0],
+					    file = split[1];
 
 					// remove dir prefix
 					file = file.replace(deployTo, '');
@@ -134,8 +134,8 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
 		for (var i in server) {
 
 			var serverFile  = server[i],
-				localFileId = arrayFind(local, 'file', serverFile.file),
-				localFile   = local[localFileId];
+			    localFileId = arrayFind(local, 'file', serverFile.file),
+			    localFile   = local[localFileId];
 
 			// if local file to server file exists
 			if (localFile !== undefined) {
@@ -197,18 +197,23 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
 		}, Promise.resolve());
 
 	}).then(function() {
+
 		if (removeEmpty) {
 			// remove all empty directories
 			console.log('Removing empty directories.');
 			return ssh.exec('find ' + deployTo + ' -empty -type d -delete');
 		}
+
 	}).then(function() {
 
 		// close SSH connection
 		ssh.end();
 
 	}).catch(function(err) {
+
+		// error messages will be catched and printed here
 		console.error(err);
+
 	});
 }
 
