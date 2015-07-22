@@ -25,8 +25,10 @@ In your project's Gruntfile, add a section named `syncdeploy` to the data object
 ```js
 grunt.initConfig({
   syncdeploy: {
-    cwd: 'dist/',
-    src: '**/*'
+    main: {
+      cwd: 'dist/',
+      src: ['**/*']
+    }
   }
 });
 ```
