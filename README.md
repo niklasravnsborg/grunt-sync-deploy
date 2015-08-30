@@ -55,13 +55,13 @@ To use this SSH configuration by default add `grunt.option('config', 'production
 ### Options
 
 #### removeEmpty
-Type: `Boolean`
+Type: `Boolean`  
 Default: `false`
 
 Remove empty directories inside the `deployTo` path on the SSH after deploying.
 
 #### keepFiles
-Type: `Array`
+Type: `Array`  
 Default: `[]`
 
 Files to keep no matter whether there are newer local files. This can be useful for config files. Use an string array of files relative to server `deployTo`.
