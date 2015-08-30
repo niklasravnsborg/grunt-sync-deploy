@@ -20,7 +20,7 @@ function arrayFind(array, key, value) {
 	}
 }
 
-function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
+function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty, keepFiles) {
 	'use strict';
 
 	var sftp,
@@ -137,6 +137,15 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty) {
 			    localFileId = arrayFind(local, 'file', serverFile.file),
 			    localFile   = local[localFileId];
 
+			// whether server file is a file to keep
+			if (keepFiles.indexOf(serverFile.file) >= 0) {
+				// end current iteration of loop
+				// the file gets prevented from being uploaded
+				console.log(serverFile.file + ' skipped.')
+				local[localFileId].done = true;
+				continue;
+			}
+
 			// if local file to server file exists
 			if (localFile !== undefined) {
 
@@ -223,7 +232,8 @@ module.exports = function(grunt) {
 	grunt.registerMultiTask('syncdeploy', 'Incremental deploy changed files to SSH.', function() {
 
 		var options = this.options({
-			removeEmpty: false
+			removeEmpty: false,
+			keepFiles: []
 		});
 
 		// tell Grunt to wait for this async code to finish
@@ -247,7 +257,7 @@ module.exports = function(grunt) {
 			}
 		});
 
-		gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, options.removeEmpty);
+		gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, options.removeEmpty, options.keepFiles);
 
 	});
 };
