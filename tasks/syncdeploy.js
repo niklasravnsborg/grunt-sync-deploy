@@ -20,15 +20,16 @@ function arrayFind(array, key, value) {
 	}
 }
 
-function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty, keepFiles) {
+function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepFiles) {
 	'use strict';
 
 	var sftp,
 	    uploadList = [],
-	    removeList = [];
+	    removeList = [],
+	    ssh = new NodeSSH;
 
 	// connect to SSH
-	ssh.connect().then(function() {
+	ssh.connect(sshconfig).then(function() {
 
 		// request a SFTP object to later use with ssh.put
 		return ssh.requestSFTP().then(function(result) {
@@ -38,7 +39,7 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty, keepFiles) 
 	}).then(function() {
 
 		// create `deployTo` directory if it doesn't exist
-		return ssh.exec('mkdir -p ' + deployTo);
+		return ssh.execCommand('mkdir -p ' + deployTo);
 
 	}).then(function() {
 
@@ -50,7 +51,7 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty, keepFiles) 
 			// | is a special char used for later string splitting
 			// %p is the filename with path
 			// \n starts a new line
-			ssh.exec(
+			ssh.execCommand(
 				'find ' + deployTo + ' -type f -printf "%c|%p\\n"'
 			).then(function(data) {
 
@@ -200,7 +201,7 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty, keepFiles) 
 				var remove = deployTo + file;
 
 				console.log('Removing', remove);
-				return ssh.exec('rm \"' + remove + '\"');
+				return ssh.execCommand('rm \"' + remove + '\"');
 			});
 
 		}, Promise.resolve());
@@ -210,7 +211,7 @@ function gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, removeEmpty, keepFiles) 
 		if (removeEmpty) {
 			// remove all empty directories
 			console.log('Removing empty directories.');
-			return ssh.exec('find ' + deployTo + ' -empty -type d -delete');
+			return ssh.execCommand('find ' + deployTo + ' -empty -type d -delete');
 		}
 
 	}).then(function() {
@@ -242,13 +243,12 @@ module.exports = function(grunt) {
 		var config    = grunt.option('config'),
 		    cwd       = this.data.cwd || '',
 		    deploySrc = [],
-		    deployTo  = grunt.config.get('sshconfig.' + config + '.deployTo');
+		    deployTo  = grunt.config.get('sshconfig.' + config + '.deployTo'),
+		    sshconfig = {};
 
-		var ssh = new NodeSSH({
-			host:     grunt.config.get('sshconfig.' + config + '.host'),
-			username: grunt.config.get('sshconfig.' + config + '.username'),
-			password: grunt.config.get('sshconfig.' + config + '.password')
-		});
+		sshconfig.host     = grunt.config.get('sshconfig.' + config + '.host');
+		sshconfig.username = grunt.config.get('sshconfig.' + config + '.username');
+		sshconfig.password = grunt.config.get('sshconfig.' + config + '.password');
 
 		this.filesSrc.forEach(function(file) {
 			// if is a file, not directory
@@ -257,7 +257,7 @@ module.exports = function(grunt) {
 			}
 		});
 
-		gruntSyncDeploy(ssh, cwd, deploySrc, deployTo, options.removeEmpty, options.keepFiles);
+		gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, options.removeEmpty, options.keepFiles);
 
 	});
 };
