@@ -64,7 +64,7 @@ Remove empty directories inside the `deployTo` path on the SSH after deploying.
 Type: `Array`  
 Default: `[]`
 
-Files to keep no matter whether there are newer local files. This can be useful for config files. Use an string array of files relative to server `deployTo`.
+Files to keep no matter whether there are newer local files. This can be useful for config files. Use an string array of files relative to server `deployTo`. You can also use [minimatch](https://github.com/isaacs/minimatch) syntax here.
 
 ### Multiple targets
 You may have more than one target if you have multiple places which you wanna deploy to.

@@ -6,9 +6,10 @@
  * Licensed under the MIT license.
  */
 
-var Q       = require('q'),
-    fsStat  = Q.nfbind(require('fs').stat),
-    NodeSSH = require('node-ssh');
+var Q         = require('q'),
+    fsStat    = Q.nfbind(require('fs').stat),
+    NodeSSH   = require('node-ssh'),
+    minimatch = require('minimatch');
 
 function arrayFind(array, key, value) {
 	'use strict';
@@ -16,6 +17,16 @@ function arrayFind(array, key, value) {
 	for (var i = 0; i < array.length; i++) {
 		if (array[i][key] == value) {
 			return i;
+		}
+	}
+}
+
+function checkMinimatchPatterns(patterns, file) {
+	'use strict';
+
+	for (var pattern of patterns) {
+		if (minimatch(file, pattern)) {
+			return true;
 		}
 	}
 }
@@ -139,7 +150,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 			    localFile   = local[localFileId];
 
 			// whether server file is a file to keep
-			if (keepFiles.indexOf(serverFile.file) >= 0) {
+			if (checkMinimatchPatterns(keepFiles, serverFile.file)) {
 				// end current iteration of loop
 				// the file gets prevented from being uploaded
 				console.log(serverFile.file + ' skipped.')
