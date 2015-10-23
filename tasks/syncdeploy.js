@@ -153,8 +153,10 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 			if (checkMinimatchPatterns(keepFiles, serverFile.file)) {
 				// end current iteration of loop
 				// the file gets prevented from being uploaded
-				console.log(serverFile.file + ' skipped.')
-				local[localFileId].done = true;
+				if (typeof local[localFileId] != 'undefined') {
+					local[localFileId].done = true;
+					console.log(serverFile.file + ' skipped.')
+				}
 				continue;
 			}
 
