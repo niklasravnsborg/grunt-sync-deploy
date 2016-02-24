@@ -66,6 +66,12 @@ Default: `[]`
 
 Files to keep no matter whether there are newer local files. This can be useful for config files. Use an string array of files relative to server `deployTo`. You can also use [minimatch](https://github.com/isaacs/minimatch) syntax here.
 
+#### serverTimezone
+Type: `String`  
+Default: `''`
+
+If the timezone for your server doesn't match up with your local the syncing won't happen correctly. In this case declare the timezone of your server. For example: `serverTimezone: 'GMT+0000'`.
+
 ### Multiple targets
 You may have more than one target if you have multiple places which you wanna deploy to.
 

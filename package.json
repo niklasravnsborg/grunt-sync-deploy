@@ -1,7 +1,7 @@
 {
   "name": "grunt-sync-deploy",
   "description": "Incremental deploy changed files to SSH.",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "homepage": "https://github.com/niklasravnsborg/grunt-sync-deploy",
   "author": {
     "name": "Niklas Ravnsborg-Gjertsen",
