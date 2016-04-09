@@ -31,7 +31,7 @@ function checkMinimatchPatterns(patterns, file) {
 	}
 }
 
-function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepFiles, serverTimezone) {
+function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepFiles, callback) {
 	'use strict';
 
 	var sftp,
@@ -231,6 +231,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 
 		// close SSH connection
 		ssh.end();
+		callback();
 
 	}).catch(function(err) {
 
@@ -252,7 +253,7 @@ module.exports = function(grunt) {
 		});
 
 		// tell Grunt to wait for this async code to finish
-		this.async();
+		var done = this.async();
 
 		var config    = grunt.option('config'),
 		    cwd       = this.data.cwd || '',
@@ -271,7 +272,9 @@ module.exports = function(grunt) {
 			}
 		});
 
-		gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, options.removeEmpty, options.keepFiles, options.serverTimezone);
+		gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, options.removeEmpty, options.keepFiles, function() {
+			done();
+		})
 
 	});
 };
