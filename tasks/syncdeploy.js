@@ -31,7 +31,7 @@ function checkMinimatchPatterns(patterns, file) {
 	}
 }
 
-function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepFiles, callback) {
+function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepFiles, serverTimezone, callback) {
 	'use strict';
 
 	var sftp,
@@ -272,7 +272,7 @@ module.exports = function(grunt) {
 			}
 		});
 
-		gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, options.removeEmpty, options.keepFiles, function() {
+		gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, options.removeEmpty, options.keepFiles, options.serverTimezone, function() {
 			done();
 		})
 
