@@ -35,6 +35,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 	'use strict';
 
 	var sftp,
+	    deployPath = '',
 	    uploadList = [],
 	    removeList = [],
 	    ssh = new NodeSSH;
@@ -49,8 +50,16 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 
 	}).then(function() {
 
-		// create `deployTo` directory if it doesn't exist
-		return ssh.execCommand('mkdir -p ' + deployTo);
+		// generate absolute path
+		return ssh.execCommand('readlink -m ' + deployTo).then(function(result) {
+			deployPath = result.stdout.trim() + '/';
+			console.log('Deploying to ' + deployPath);
+		});
+
+	}).then(function() {
+
+		// create server deploy directory if it doesn't exist
+		return ssh.execCommand('mkdir -p ' + deployPath);
 
 	}).then(function() {
 
@@ -63,7 +72,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 			// %p is the filename with path
 			// \n starts a new line
 			ssh.execCommand(
-				'find ' + deployTo + ' -type f -printf "%c|%p\\n"'
+				'find ' + deployPath + ' -type f -printf "%c|%p\\n"'
 			).then(function(data) {
 
 				// if nothing on the server and no error
@@ -91,7 +100,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 					    file = split[1];
 
 					// remove dir prefix
-					file = file.replace(deployTo, '');
+					file = file.replace(deployPath, '');
 
 					// parse date string to `Date`
 					date = new Date(Date.parse(date + serverTimezone));
@@ -197,7 +206,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 			// appends these then functions to sequence
 			return sequence.then(function() {
 				var upload   = cwd + file,
-				    uploadTo = deployTo + file;
+				    uploadTo = deployPath + file;
 
 				console.log('Uploading', upload);
 				return ssh.put(upload, uploadTo, sftp);
@@ -211,7 +220,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 		return removeList.reduce(function(sequence, file, index) {
 
 			return sequence.then(function() {
-				var remove = deployTo + file;
+				var remove = deployPath + file;
 
 				console.log('Removing', remove);
 				return ssh.execCommand('rm \"' + remove + '\"');
@@ -224,7 +233,7 @@ function gruntSyncDeploy(sshconfig, cwd, deploySrc, deployTo, removeEmpty, keepF
 		if (removeEmpty) {
 			// remove all empty directories
 			console.log('Removing empty directories.');
-			return ssh.execCommand('find ' + deployTo + ' -empty -type d -delete');
+			return ssh.execCommand('find ' + deployPath + ' -empty -type d -delete');
 		}
 
 	}).then(function() {
