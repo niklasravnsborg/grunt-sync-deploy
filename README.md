@@ -41,6 +41,7 @@ deployInfo: grunt.file.readJSON('deploy_info.json'),
 sshconfig: {
   production: {
     host: '<%= deployInfo.host %>',
+    port: '<%= deployInfo.port %>', // optional
     username: '<%= deployInfo.username %>',
     password: '<%= deployInfo.password %>',
     deployTo: '<%= deployInfo.deployTo %>'
@@ -81,12 +82,14 @@ deployInfo: grunt.file.readJSON('deploy_info.json'),
 sshconfig: {
   staging: {
     host: '<%= deployInfo.host %>',
+    port: '<%= deployInfo.port %>', // optional
     username: '<%= deployInfo.username %>',
     password: '<%= deployInfo.password %>',
     deployTo: '<%= deployInfo.deployTo %>'
   },
   production: {
     host: '<%= deployInfo.host %>',
+    port: '<%= deployInfo.port %>', // optional
     username: '<%= deployInfo.username %>',
     password: '<%= deployInfo.password %>',
     deployTo: '<%= deployInfo.deployTo %>'

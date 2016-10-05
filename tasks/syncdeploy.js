@@ -262,6 +262,7 @@ module.exports = function(grunt) {
 		    sshconfig = {};
 
 		sshconfig.host     = grunt.config.get('sshconfig.' + config + '.host');
+		sshconfig.port     = grunt.config.get('sshconfig.' + config + '.port') || 22;
 		sshconfig.username = grunt.config.get('sshconfig.' + config + '.username');
 		sshconfig.password = grunt.config.get('sshconfig.' + config + '.password');
 
