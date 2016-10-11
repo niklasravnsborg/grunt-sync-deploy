@@ -1,6 +1,14 @@
 # grunt-sync-deploy
 
-> Incremental deploy changed files to SSH.
+> Automatically synchronize changed local files with your server.
+
+This Grunt plugin is a simple deployment system which can run on your local environment. Every time you deploy, the plugin  compares the file dates on your server with your local ones. This way it will upload only the new and changed files. This is valuable on managed servers that don't support complex autonomous deployments or version control.
+
+## What you need
+
+* SSH access to your server
+* [Grunt: The JavaScript Task Runner](http://gruntjs.com)
+* This plugin
 
 ## Getting Started
 This plugin requires Grunt `>=0.4.0`
@@ -65,16 +73,16 @@ Remove empty directories inside the `deployTo` path on the SSH after deploying.
 Type: `Array`  
 Default: `[]`
 
-Files to keep no matter whether there are newer local files. This can be useful for config files. Use an string array of files relative to server `deployTo`. You can also use [minimatch](https://github.com/isaacs/minimatch) syntax here.
+Files to keep no matter whether there are newer local files. This can be useful for config files. Use an array with the paths to the files you want to keep. This has to be relative to the `deployTo` path. You can also use [minimatch](https://github.com/isaacs/minimatch) syntax here.
 
 #### serverTimezone
 Type: `String`  
 Default: `''`
 
-If the timezone for your server doesn't match up with your local the syncing won't happen correctly. In this case declare the timezone of your server. For example: `serverTimezone: 'GMT+0000'`.
+If the timezone of your server doesn't match up with your local one the syncing may not happen correctly. In this case you can declare the timezone of your server. For example: `serverTimezone: 'GMT+0000'`.
 
 ### Multiple targets
-You may have more than one target if you have multiple places which you wanna deploy to.
+You may have more than one target (e.g. staging, production) if you have multiple places which you want to deploy to.
 
 ```js
 // don't keep SSH credentials in source control!
