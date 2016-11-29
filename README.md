@@ -48,8 +48,25 @@ You'll also have to add a `sshconfig` to pass the SSH configuration for your Ser
 deployInfo: grunt.file.readJSON('deploy_info.json'),
 sshconfig: {
   production: {
-    host: '<%= deployInfo.host %>',
-    port: '<%= deployInfo.port %>', // optional
+    host:       '<%= deployInfo.host %>',
+    port:       '<%= deployInfo.port %>', // optional
+    username:   '<%= deployInfo.username %>',
+    privateKey: '<%= deployInfo.privateKey %>',
+    passphrase: '<%= deployInfo.password %>', // passphrase for your key, optional
+    deployTo:   '<%= deployInfo.deployTo %>'
+  }
+}
+```
+
+You can also authenticate using a password:
+
+```js
+// don't keep SSH credentials in source control!
+deployInfo: grunt.file.readJSON('deploy_info.json'),
+sshconfig: {
+  production: {
+    host:     '<%= deployInfo.host %>',
+    port:     '<%= deployInfo.port %>', // optional
     username: '<%= deployInfo.username %>',
     password: '<%= deployInfo.password %>',
     deployTo: '<%= deployInfo.deployTo %>'
@@ -57,7 +74,7 @@ sshconfig: {
 }
 ```
 
-`deployTo` is a folder on the SSH which you like to sync with the specified `src`.
+`deployTo` is the folder on the SSH server you'd like to sync with the specified `src`.
 
 To use this SSH configuration by default add `grunt.option('config', 'production');` to the end of your Gruntfile.
 

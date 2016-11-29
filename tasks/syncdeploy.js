@@ -270,10 +270,16 @@ module.exports = function(grunt) {
 		    deployTo  = grunt.config.get('sshconfig.' + config + '.deployTo'),
 		    sshconfig = {};
 
-		sshconfig.host     = grunt.config.get('sshconfig.' + config + '.host');
-		sshconfig.port     = grunt.config.get('sshconfig.' + config + '.port') || 22;
-		sshconfig.username = grunt.config.get('sshconfig.' + config + '.username');
-		sshconfig.password = grunt.config.get('sshconfig.' + config + '.password');
+		sshconfig.host       = grunt.config.get('sshconfig.' + config + '.host');
+		sshconfig.port       = grunt.config.get('sshconfig.' + config + '.port') || 22;
+		sshconfig.username   = grunt.config.get('sshconfig.' + config + '.username');
+		sshconfig.password   = grunt.config.get('sshconfig.' + config + '.password');
+		sshconfig.privateKey = grunt.config.get('sshconfig.' + config + '.privateKey')
+		sshconfig.passphrase = grunt.config.get('sshconfig.' + config + '.passphrase');
+
+		if (!sshconfig.password && !sshconfig.privateKey) {
+			sshconfig.privateKey = process.env['HOME'] + '/.ssh/id_rsa';
+		}
 
 		this.filesSrc.forEach(function(file) {
 			// if is a file, not directory
